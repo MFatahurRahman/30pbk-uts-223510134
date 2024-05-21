@@ -2,12 +2,147 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vite App</title>
+  <title>Vue.js Todos App</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    header {
+      width: 100%;
+      background-color: #333;
+      color: #fff;
+      padding: 10px 0;
+      text-align: center;
+    }
+    header nav {
+      display: flex;
+      justify-content: center;
+    }
+    header nav a {
+      color: #fff;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+    header nav a:hover {
+      text-decoration: underline;
+    }
+    .todos-container {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .todos-container input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+    .todos-container textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+    .todos-container ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .todos-container li {
+      margin-bottom: 8px;
+      background-color: #f4f4f4;
+      padding: 8px;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.js"></script>
+  <div class="container">
+    <header>
+      <nav>
+        <a href="#" @click="showTodos = false">Home</a>
+        <a href="#" @click="showTodos = false">About</a>
+        <a href="https://jsonplaceholder.typicode.com/posts" target="_blank">Post</a>
+        <a href="#" @click="showTodos = true">Todos</a>
+      </nav>
+    </header>
+    <div id="app">
+      <div v-if="!showTodos">
+        <h2>Form Kegiatan</h2>
+        <form @submit.prevent="submitForm">
+          <label for="userSelect">Pilih Pengguna:</label>
+          <select id="userSelect" v-model="selectedUser">
+            <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
+          </select>
+          <button type="submit">Tambah Kegiatan</button>
+        </form>
+      </div>
+      <div v-if="showTodos" class="todos-container">
+        <h2>Daftar Kegiatan</h2>
+        <form @submit.prevent="addTodo">
+          <input type="text" v-model="newTodo.title" placeholder="Judul kegiatan">
+          <textarea v-model="newTodo.description" placeholder="Deskripsi kegiatan"></textarea>
+          <button type="submit">Tambah</button>
+        </form>
+        <ul v-if="todos.length">
+          <li v-for="(todo, index) in todos" :key="index">
+            <strong>{{ todo.title }}</strong>
+            <p>{{ todo.description }}</p>
+            <button @click="removeTodo(index)">Hapus</button>
+          </li>
+        </ul>
+        <p v-else>Tidak ada kegiatan yang ditambahkan.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        selectedUser: null,
+        showTodos: false,
+        newTodo: {
+          title: '',
+          description: ''
+        },
+        todos: [],
+        users: [
+          { id: 1, name: 'John' },
+          { id: 2, name: 'Jane' },
+          { id: 3, name: 'Doe' }
+        ]
+      },
+      methods: {
+        submitForm() {
+          if (!this.selectedUser) {
+            alert('Silakan pilih pengguna terlebih dahulu.');
+            return;
+          }
+          alert('Kegiatan ditambahkan untuk pengguna dengan ID: ' + this.selectedUser);
+        },
+        addTodo() {
+          if (this.newTodo.title.trim() !== '') {
+            this.todos.push({ title: this.newTodo.title, description: this.newTodo.description });
+            this.newTodo.title = '';
+            this.newTodo.description = '';
+          }
+        },
+        removeTodo(index) {
+          this.todos.splice(index, 1);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
